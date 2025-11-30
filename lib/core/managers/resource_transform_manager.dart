@@ -55,8 +55,8 @@ class ResourceTransformManager {
     return inputs;
   }
 
-  double _coefForBuildingLevel(int lvl) => 1 + (lvl - 1) * 0.05;
-  double _coefForArtisanLevel(int lvl) => 1 + (lvl - 1) * 0.03;
+  double coefForBuildingLevel(int lvl) => 1 + (lvl - 1) * 0.05;
+  double coefForArtisanLevel(int lvl) => 1 + (lvl - 1) * 0.03;
 
   List<Personnage> _assignedArtisans(Domain d, String batimentId) {
     return d.personnages
@@ -74,8 +74,8 @@ class ResourceTransformManager {
 
     final artisans = _assignedArtisans(d, b.id);
     if (artisans.isEmpty) return 0.0;
-    final coefB = _coefForBuildingLevel(b.xpStats.level);
-    final avgCoefA = artisans.map((a) => _coefForArtisanLevel(a.xpStats.level)).fold(0.0, (s, v) => s + v) / artisans.length;
+    final coefB = coefForBuildingLevel(b.xpStats.level);
+    final avgCoefA = artisans.map((a) => coefForArtisanLevel(a.xpStats.level)).fold(0.0, (s, v) => s + v) / artisans.length;
     return base * artisans.length * coefB * avgCoefA;
   }
 

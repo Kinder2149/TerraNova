@@ -18,8 +18,8 @@ class ProductionService {
   }
 
   // Coefficients
-  double coefForBuildingLevel(int lvl) => 1 + (lvl - 1) * 0.05;
-  double coefForArtisanLevel(int lvl) => 1 + (lvl - 1) * 0.03;
+  double coefForBuildingLevel(int lvl) => _transformManager.coefForBuildingLevel(lvl);
+  double coefForArtisanLevel(int lvl) => _transformManager.coefForArtisanLevel(lvl);
 
   int _artisanCountAssigned(Domain d, String batimentId) {
     return d.personnages
@@ -81,12 +81,13 @@ class ProductionService {
   }
 
   bool _isTransformingBuilding(Batiment b) {
-    return b.nom == AppStrings.batAtelierTannage || b.nom == AppStrings.batAtelierPierre;
+    return b.nom == AppStrings.batAtelierTannage || b.nom == AppStrings.batAtelierPierre || b.nom == AppStrings.batBoucherie;
   }
 
   String? _outputKeyForBuilding(Batiment b) {
     if (b.nom == AppStrings.batAtelierTannage) return ResourceKeys.cuir;
     if (b.nom == AppStrings.batAtelierPierre) return ResourceKeys.outilSimple;
+    if (b.nom == AppStrings.batBoucherie) return ResourceKeys.viande;
     return null;
   }
 

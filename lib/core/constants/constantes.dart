@@ -63,7 +63,7 @@ class AppStrings {
   static const String batCabanePeche = 'Cabane de pêche';
   static const String batAtelierPierre = 'Atelier de pierre';
   static const String batMinePierre = 'Mine de pierre';
-  static const String batAtelierTannage = 'Atelier de tanage';
+  static const String batAtelierTannage = 'Atelier de tannage';
   static const String batCabaneAgricole = 'Cabane agricole';
   static const String batEntrepot = 'Entrepôt';
   static const String batGrenier = 'Grenier';
@@ -213,7 +213,7 @@ const List<Map<String, Object>> TRANSFORM_RECIPES = [
     'inputs': {ResourceKeys.animaux: 1},
     'buildingKey': BuildingKeys.atelierTannage,
     'minLevel': 1,
-    'yieldBase': 1.0,
+    'yieldBase': 0.9,
   },
   {
     'outputResourceKey': ResourceKeys.outilSimple,

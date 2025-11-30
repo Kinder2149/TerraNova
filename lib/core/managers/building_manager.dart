@@ -26,7 +26,8 @@ class BuildingManager {
     if (r == null) throw StateError('Ressource produite introuvable');
     if (r.nom == AppStrings.resEau) return AppStrings.funcPuits;
     if (r.nom == AppStrings.resBois) return AppStrings.funcBucheron;
-    if (r.nom == AppStrings.resViande) return AppStrings.funcChasse;
+    if (r.nom == AppStrings.resAnimaux) return AppStrings.funcChasse;
+    if (r.nom == AppStrings.resViande) return AppStrings.funcBoucherie;
     // Par défaut: fonction générique
     return 'Production: ${r.nom}';
   }

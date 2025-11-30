@@ -332,7 +332,7 @@ class _MappingScreenState extends State<MappingScreen> {
               final prodResName = isProducteur
                   ? (b.nom == AppStrings.batPuits
                       ? AppStrings.resEau
-                      : (b.nom == AppStrings.batCabaneBucheron ? AppStrings.resBois : AppStrings.resViande))
+                      : (b.nom == AppStrings.batCabaneBucheron ? AppStrings.resBois : AppStrings.resAnimaux))
                   : null;
               final produced = isProducteur ? (prodPreview.byBuilding[b.id] ?? 0) : 0;
 

@@ -76,7 +76,7 @@ class DataInitService {
       description: AppStrings.descCabaneChasse,
       niveau: 1,
       xpStats: xpStart,
-      producedResourceId: 'res-viande-1',
+      producedResourceId: 'res-animaux-1',
     );
 
     // Ressources vitales à 0
@@ -205,6 +205,16 @@ class DataInitService {
       xpStats: xpStart,
       producedResourceId: 'res-cuir-1',
     );
+    final boucherie = Batiment(
+      id: 'bat-boucherie-1',
+      nom: AppStrings.batBoucherie,
+      fonction: AppStrings.funcBoucherie,
+      sousCategorie: SousCategorie.production,
+      description: AppStrings.descBoucherie,
+      niveau: 1,
+      xpStats: xpStart,
+      producedResourceId: 'res-viande-1',
+    );
     final cabaneAgricole = Batiment(
       id: 'bat-agricole-1',
       nom: AppStrings.batCabaneAgricole,
@@ -245,6 +255,7 @@ class DataInitService {
         puits,
         cabaneB,
         cabaneC,
+        boucherie,
         cabanePeche,
         atelierPierre,
         minePierre,
