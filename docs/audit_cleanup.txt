@@ -1,0 +1,94 @@
+TerraNova 1.1 — Audit & Nettoyage (Loops/Production & Mocks)
+Date: 2025-11-30
+
+1) Systèmes identifiés (loops/production/état)
+- lib/core/services/production_service.dart
+  Rôle: service central de production; calcule la production par tick en fonction des artisans affectés.
+  Observations: unique point de calcul; pas de handlers par bâtiment.
+
+- lib/core/managers/domain_manager.dart
+  Rôle: oriente les appels de production via applyProductionTick() et expose computeProductionPreview().
+  Observations: centralise l'accès; aucun loop distribué par building.
+
+- lib/core/managers/building_manager.dart
+  Rôle: assignation/désassignation Artisans ↔ Bâtiments; pas de logique de loop.
+  Observations: pas de production interne; conforme.
+
+- lib/core/managers/population_manager.dart
+  Rôle: hébergement (capacités QG/Maison); pas de logique de loop/production.
+  Observations: conforme.
+
+- lib/ui/screens/mapping/mapping_screen.dart
+  Rôle: UI de dev; bouton 'Tick production' appelle DomainManager.applyProductionTick(); affichage preview via computeProductionPreview().
+  Observations: pas de loop autonome ni de timer; déclenchement manuel uniquement.
+
+- lib/core/services/data_init_service.dart
+  Rôle: bootstrap; initialise bâtiments/ressources; aucun mock de production par building.
+  Observations: conforme (pas de personnages par défaut, plus d'anciens samples actifs).
+
+- test/data_init_test.dart (tests)
+  Rôle: ancien test d'échantillons (sample) exigeant au moins 1 personnage.
+  Observations: obsolète après suppression des mocks; non aligné avec l'état initial réel.
+
+2) Actions proposées par fichier/service
+- production_service.dart → CONSERVER
+  Note: conserver comme point unique de vérité. Simplification: garder preview + applyTick; éviter toute duplication côté UI.
+
+- domain_manager.dart → CONSERVER (avec note)
+  Note: conserver l'orchestration (applyProductionTick/computePreview). Éviter d'ajouter des mini-loops ailleurs.
+
+- building_manager.dart → CONSERVER
+  Note: pas de production ici; ne pas y ajouter de loops.
+
+- population_manager.dart → CONSERVER
+  Note: logique d'hébergement uniquement; pas de loop.
+
+- mapping_screen.dart → CONSERVER (avec note)
+  Note: déclenchement manuel (dev) OK; si un scheduler global est ajouté plus tard, déporter dans un LoopManager dédié et retirer le bouton.
+
+- data_init_service.dart → CONSERVER
+  Note: état initial réel; ne pas réintroduire de mocks.
+
+- test/data_init_test.dart → SUPPRIMER
+  Raison: basé sur anciens mocks (exige ≥1 personnage par défaut). Non pertinent après refonte; provoque des échecs de tests.
+
+3) Fichiers supprimés
+- test/data_init_test.dart (proposé à la suppression; voir instructions de rollback ci-dessous)
+
+4) Remplacements et migration (proposés)
+- LoopManager (futur): si un tick automatique est requis, créer un service unique (ex: core/services/loop_manager.dart) pilotant applyProductionTick() à intervalle fixe. Ne pas implémenter des loops par building.
+- BuildingProductionService (option): si des règles spécifiques de production par type sont ajoutées, encapsuler dans un service unique appelé par ProductionService pour garder la centralisation.
+
+5) Instructions de rollback
+- Pour restaurer le test supprimé: reprendre le fichier
+  test/data_init_test.dart
+  dans docs/archive/ (si vous avez conservé une copie), ou via l'historique Git.
+- Réactiver les anciens mocks nécessiterait de réintroduire des personnages par défaut dans DataInitService (non recommandé).
+
+6) Notes finales
+- Aucun fichier de 'per-building tick handler' n'a été détecté dans lib/.
+- Les mocks restants identifiés étaient uniquement dans test/data_init_test.dart.
+- L'architecture actuelle est centralisée (ProductionService + DomainManager) et conforme aux objectifs de simplification.
+
+---
+Journal des suppressions
+- 2025-11-30: Suppression réalisée — test/data_init_test.dart (obsolète; erreurs de mocks). Statut: le fichier n'était déjà plus présent au moment de l'opération.
+
+---
+Actions réalisées le 2025-11-30 (PROMPTs 2 → 9)
+- Créé: lib/core/models/resource/rarity.dart (enum Rarity + displayName)
+- Créé: lib/core/constants/rarity_config.dart (BASE_PRODUCTION + baseFor)
+- Modifié: lib/core/constants/constantes.dart (libellés de rareté)
+- Modifié: lib/core/models/ressource.dart (ajout rarity, fromJson/toJson)
+- Modifié: lib/core/services/data_init_service.dart (rarity=Abundant, quantiteStock=0; producedResourceId sur producteurs)
+- Modifié: lib/core/models/batiment.dart (producedResourceId, assignedArtisanIds, baseProductionFromResource)
+- Créé: lib/core/models/personnage_artisan.dart (XPStats, assignedBuildingId, isAssigned)
+- Modifié: lib/core/services/production_service.dart (coef niveaux, computeProductionForBuilding, applyProductionTick)
+- Créé: lib/core/services/loop_manager.dart (start/stop/tickOnce + onTick stream)
+- Modifié: lib/ui/screens/mapping/mapping_screen.dart (section Production Test: dropdown, assignation, Tick Once, logs, per-tick par ressource via IDs)
+
+Éléments en attente (TODO)
+- Buffs/effets bonus non implémentés (hook prévu dans ProductionService)
+- Coûts/économie d’upgrade (BuildingUpgradeService) — à définir
+- Persistance locale (aucun IO pour l’instant) — prévoir migration schema `rarity`, ids de production
+- Harmoniser modèle Artisan (nouveau fichier) avec Personnage si nécessaire (migration douce)

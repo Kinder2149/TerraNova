@@ -1,0 +1,34 @@
+{
+  "ressources": [
+    {
+      "nom": "Eau",
+      "fonction": "",
+      "sousCategorie": "vitale",
+      "description": "Ressource vitale de base",
+      "quantiteStock": 0.0,
+      "rarity": "abundant"
+    }
+  ],
+  "batiments": [
+    {
+      "nom": "Puits",
+      "fonction": "Extraction",
+      "sousCategorie": "vitale",
+      "description": "Fournit de l'eau",
+      "niveau": 1,
+      "producedResourceId": "res-eau-1",
+      "xpStats": { "level": 1, "currentXp": 0, "xpToNextLevel": 100 }
+    }
+  ],
+  "personnages": [
+    {
+      "nom": "Ari",
+      "fonction": "Travailleur",
+      "sousCategorie": "vitale",
+      "niveau": 1,
+      "type": "Artisan",
+      "assignedBatimentId": "bat-puits-1",
+      "xpStats": { "level": 1, "currentXp": 0, "xpToNextLevel": 100 }
+    }
+  ]
+}
