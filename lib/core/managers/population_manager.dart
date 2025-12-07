@@ -1,7 +1,7 @@
-import 'package:terranova/core/constants/constantes.dart';
 import 'package:terranova/core/models/batiment.dart';
 import 'package:terranova/core/models/domain.dart';
 import 'package:terranova/core/models/personnage.dart';
+import 'package:terranova/core/constants/constantes.dart';
 
 class PopulationManager {
   const PopulationManager();
@@ -10,6 +10,32 @@ class PopulationManager {
   int _qgCapacityForLevel(int level) {
     // extensible: table par niveau si besoin
     return AppStrings.qgCapVillageoisL1;
+  }
+
+  // ===================== Capacités par bâtiment (Explorateurs / Soldats) =====================
+  int _capacityForBuildingKeyLevel(String buildingKey, int level) {
+    final table = BUILDING_CAPACITY_BY_LEVEL[buildingKey];
+    if (table == null || table.isEmpty) return 0;
+    final idx = (level - 1).clamp(0, table.length - 1);
+    return table[idx];
+    }
+
+  int countAssignedToBuildingByType(Domain d, String batimentId, String type) {
+    return d.personnages.where((p) => p.type == type && p.assignedBatimentId == batimentId).length;
+  }
+
+  bool canAddToBuilding(Domain d, Batiment b, String type) {
+    // Résolution: type → buildingKey attendu
+    String? requiredKey;
+    if (type == AppStrings.TYPE_EXPLORATEUR) requiredKey = BuildingKeys.BAT_CABANE_EXPLORATEUR;
+    if (type == AppStrings.TYPE_SOLDAT) requiredKey = BuildingKeys.BAT_CASERNE;
+    if (requiredKey == null) return false;
+    // Vérifier que le nom du bâtiment correspond à la clé attendue
+    final expectedName = BUILDING_KEY_TO_NAME[requiredKey];
+    if (expectedName == null || b.nom != expectedName) return false;
+    final cap = _capacityForBuildingKeyLevel(requiredKey, b.niveau);
+    final current = countAssignedToBuildingByType(d, b.id, type);
+    return current < cap;
   }
 
   int _maisonCapacityForLevel(int level) {

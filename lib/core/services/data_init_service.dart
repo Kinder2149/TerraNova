@@ -111,10 +111,10 @@ class DataInitService {
     // Nouvelles ressources de production (stock 0 au départ)
     final animaux = Ressource(
       id: 'res-animaux-1',
-      nom: 'Animaux',
+      nom: AppStrings.resAnimaux,
       fonction: '',
       sousCategorie: SousCategorie.production,
-      description: 'Ressource animale de base.',
+      description: AppStrings.descAnimaux,
       quantiteStock: 0,
       rarity: Rarity.common,
     );
@@ -161,6 +161,17 @@ class DataInitService {
       sousCategorie: SousCategorie.production,
       description: AppStrings.descCereale,
       quantiteStock: 0,
+      rarity: Rarity.abundant,
+    );
+
+    // Monnaie: Novas (stock initial)
+    final novas = Ressource(
+      id: 'res-novas-1',
+      nom: AppStrings.NAME_NOVAS,
+      fonction: '',
+      sousCategorie: SousCategorie.banque,
+      description: AppStrings.DESC_NOVAS,
+      quantiteStock: STARTING_NOVAS,
       rarity: Rarity.abundant,
     );
 
@@ -244,6 +255,26 @@ class DataInitService {
       xpStats: xpStart,
     );
 
+    // Nouveaux bâtiments (non producteurs): Caserne & Cabane d'explorateur
+    final caserne = Batiment(
+      id: 'bat-caserne-1',
+      nom: AppStrings.NAME_CASERNE,
+      fonction: 'Recrutement et hébergement Soldats',
+      sousCategorie: SousCategorie.vitale,
+      description: AppStrings.DESC_CASERNE,
+      niveau: 1,
+      xpStats: xpStart,
+    );
+    final cabaneExplorateur = Batiment(
+      id: 'bat-cabane-expl-1',
+      nom: AppStrings.NAME_CABANE_EXPLORATEUR,
+      fonction: 'Recrutement et hébergement Explorateurs',
+      sousCategorie: SousCategorie.production,
+      description: AppStrings.DESC_CABANE_EXPLORATEUR,
+      niveau: 1,
+      xpStats: xpStart,
+    );
+
     final domaineAlpha = Domain(
       id: 'dom-1',
       nom: AppStrings.defaultDomainName,
@@ -263,6 +294,8 @@ class DataInitService {
         cabaneAgricole,
         entrepot,
         grenier,
+        caserne,
+        cabaneExplorateur,
       ],
       ressources: [
         eau,
@@ -274,6 +307,7 @@ class DataInitService {
         pierre,
         cuir,
         cereale,
+        novas,
       ],
       playerXp: xpStart,
     );

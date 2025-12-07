@@ -120,6 +120,11 @@ class _MappingScreenState extends State<MappingScreen> {
               padding: const EdgeInsets.all(AppDimens.paddingM),
               children: [
                 _InfoTile(title: AppStrings.backendStateLabel, value: status),
+                if (domains.isNotEmpty)
+                  _InfoTile(
+                    title: 'Novas',
+                    value: _manager.getNovas(domains.first.id).toStringAsFixed(2),
+                  ),
                 const SizedBox(height: AppDimens.paddingS),
                 Text(AppStrings.domains, style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppDimens.paddingS),
@@ -261,6 +266,44 @@ class _MappingScreenState extends State<MappingScreen> {
                   },
                   child: const Text('Tick production'),
                 ),
+              ],
+            ),
+          ),
+          _SectionTitle(title: 'Recrutement'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppDimens.paddingM),
+            child: Wrap(
+              spacing: AppDimens.gapXS,
+              runSpacing: AppDimens.gapXS,
+              children: [
+                if (d.batiments.any((b) => b.nom == AppStrings.NAME_CASERNE))
+                  ElevatedButton(
+                    onPressed: () async {
+                      final caserne = d.batiments.firstWhere((b) => b.nom == AppStrings.NAME_CASERNE);
+                      try {
+                        await _manager.recruterSoldat(d.id, caserne.id);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Soldat recruté (-10 Novas)')));
+                        setState(() {});
+                      } catch (e) {
+                        _showError(context, e.toString());
+                      }
+                    },
+                    child: const Text('Recruter Soldat (10 Novas)'),
+                  ),
+                if (d.batiments.any((b) => b.nom == AppStrings.NAME_CABANE_EXPLORATEUR))
+                  ElevatedButton(
+                    onPressed: () async {
+                      final cabane = d.batiments.firstWhere((b) => b.nom == AppStrings.NAME_CABANE_EXPLORATEUR);
+                      try {
+                        await _manager.recruterExplorateur(d.id, cabane.id);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Explorateur recruté (-8 Novas)')));
+                        setState(() {});
+                      } catch (e) {
+                        _showError(context, e.toString());
+                      }
+                    },
+                    child: const Text('Recruter Explorateur (8 Novas)'),
+                  ),
               ],
             ),
           ),

@@ -5,10 +5,13 @@ import '../services/data_init_service.dart';
 import '../services/production_service.dart';
 import '../managers/building_manager.dart';
 import '../services/xp_manager.dart';
+import '../services/monnaie_service.dart';
+import '../services/name_service.dart';
 import '../models/domain.dart';
 import '../models/personnage.dart';
 import '../models/batiment.dart';
 import '../models/ressource.dart';
+import '../models/base_element.dart';
 import '../managers/population_manager.dart';
 import 'package:terranova/core/constants/constantes.dart';
 import 'package:terranova/core/constants/xp_config.dart';
@@ -25,12 +28,28 @@ class DomainManager {
   final BuildingManager _buildingManager = const BuildingManager();
   final ProductionService _productionService = const ProductionService();
   final XPManager _xpManager = const XPManager();
+  final MonnaieService _monnaie = const MonnaieService();
+  final NameService _nameService = NameService();
 
   String _status = AppStrings.statusNotInitialized;
   List<Domain> _domains = const [];
 
   String get status => _status;
   List<Domain> getDomains() => List.unmodifiable(_domains);
+
+  // ===================== Monnaie (Novas) =====================
+  double getNovas(String domainId) {
+    final idx = _indexOfDomain(domainId);
+    if (idx == -1) throw StateError(AppStrings.errDomainNotFound);
+    return _monnaie.getNovas(_domains[idx]);
+  }
+
+  Future<Domain> addNovas(String domainId, double amount) async {
+    final idx = _indexOfDomain(domainId);
+    if (idx == -1) throw StateError(AppStrings.errDomainNotFound);
+    final updated = _monnaie.addNovas(_domains[idx], amount);
+    return _updateAt(idx, updated);
+  }
 
   /// Initialise les données en mémoire depuis DataInitService et passe le statut à READY.
   Future<void> init() async {
@@ -300,6 +319,66 @@ class DomainManager {
       personnages: updatedPersons,
       batiments: List<Batiment>.from(d.batiments),
       ressources: List<Ressource>.from(d.ressources),
+      playerXp: d.playerXp,
+    );
+    return _updateAt(idx, updated);
+  }
+
+  // ===================== Recrutement (coûts Novas + capacités) =====================
+  Future<Domain> recruterExplorateur(String domainId, String batimentId) async {
+    return _recruterPersonnage(domainId, batimentId, AppStrings.TYPE_EXPLORATEUR);
+  }
+
+  Future<Domain> recruterSoldat(String domainId, String batimentId) async {
+    return _recruterPersonnage(domainId, batimentId, AppStrings.TYPE_SOLDAT);
+  }
+
+  Future<Domain> _recruterPersonnage(String domainId, String batimentId, String type) async {
+    final idx = _indexOfDomain(domainId);
+    if (idx == -1) throw StateError(AppStrings.errDomainNotFound);
+    final d = _domains[idx];
+    final b = d.batiments.firstWhere((x) => x.id == batimentId, orElse: () => throw StateError('Bâtiment introuvable'));
+
+    // Vérifier capacité pour le type sur ce bâtiment
+    if (!_populationManager.canAddToBuilding(d, b, type)) {
+      throw StateError('Capacité max atteinte pour $type dans ${b.nom}');
+    }
+
+    // Coût
+    final cost = PERSONNAGE_COST_NOVAS[type] ?? 0;
+    if (cost > 0) {
+      final spent = _monnaie.spendNovas(d, cost.toDouble());
+      if (!spent.ok) {
+        throw StateError('Fonds Novas insuffisants');
+      }
+      // Mettre à jour le domain avec le débit effectué
+      _updateAt(idx, spent.domain);
+    }
+
+    final xp = XPStats(level: 1, currentXp: 0, xpToNextLevel: XPConfig.getXpForLevel(1));
+    final name = _nameService.generateRandomName();
+    final p = Personnage(
+      id: 'pers-${DateTime.now().microsecondsSinceEpoch}',
+      nom: name,
+      fonction: type,
+      sousCategorie: SousCategorie.vitale,
+      niveau: 1,
+      type: type,
+      etat: AppStrings.etatOccupe,
+      metier: null,
+      assignedBatimentId: batimentId,
+      dortoir: null,
+      pvMax: null,
+      attaque: null,
+      xpStats: xp,
+    );
+    final updated = Domain(
+      id: d.id,
+      nom: d.nom,
+      nvx: d.nvx,
+      personnages: List<Personnage>.from(d.personnages)..add(p),
+      batiments: List<Batiment>.from(d.batiments),
+      ressources: List<Ressource>.from(_domains[idx].ressources),
       playerXp: d.playerXp,
     );
     return _updateAt(idx, updated);

@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:terranova/core/constants/constantes.dart';
+import 'package:terranova/core/constants/xp_config.dart';
 import 'package:terranova/core/models/base_element.dart';
 import 'package:terranova/core/models/personnage.dart';
 import 'package:terranova/core/models/ressource.dart';
@@ -25,7 +27,7 @@ class CreationService {
   }
 
   XPStats defaultsXp() {
-    return const XPStats(level: 1, currentXp: 0, xpToNextLevel: 100);
+    return XPStats(level: 1, currentXp: 0, xpToNextLevel: XPConfig.getXpForLevel(1));
   }
 
   void ensureUniqueId(Map<String, dynamic> domain, String id) {
@@ -53,8 +55,8 @@ class CreationService {
 
   Personnage createPersonnage(Map<String, dynamic> input, {Map<String, dynamic>? domain}) {
     _resetWarnings();
-    final id = input['id'] as String? ?? generateId('per', input['nom'] as String? ?? 'personnage');
-    _validateIdPrefix(id, allowed: const ['per-']);
+    final id = input['id'] as String? ?? generateId(AppIds.persPrefix, input['nom'] as String? ?? 'personnage');
+    _validateIdPrefix(id, allowed: const [AppIds.persPrefix]);
     if (domain != null) ensureUniqueId(domain, id);
     if (domain != null) validateRelations(domain, input);
     final sousCat = _readSousCategorieSafe(input['sousCategorie']);
@@ -83,8 +85,8 @@ class CreationService {
 
   Ressource createRessource(Map<String, dynamic> input, {Map<String, dynamic>? domain}) {
     _resetWarnings();
-    final id = input['id'] as String? ?? generateId('res', input['nom'] as String? ?? 'ressource');
-    _validateIdPrefix(id, allowed: const ['res-']);
+    final id = input['id'] as String? ?? generateId(AppIds.resPrefix, input['nom'] as String? ?? 'ressource');
+    _validateIdPrefix(id, allowed: const [AppIds.resPrefix]);
     if (domain != null) ensureUniqueId(domain, id);
     final rarityVal = input['rarity'];
     final rarity = _readRaritySafe(rarityVal);
@@ -101,8 +103,8 @@ class CreationService {
 
   Batiment createBatiment(Map<String, dynamic> input, {Map<String, dynamic>? domain}) {
     _resetWarnings();
-    final id = input['id'] as String? ?? generateId('bat', input['nom'] as String? ?? 'batiment');
-    _validateIdPrefix(id, allowed: const ['bat-']);
+    final id = input['id'] as String? ?? generateId(AppIds.batPrefix, input['nom'] as String? ?? 'batiment');
+    _validateIdPrefix(id, allowed: const [AppIds.batPrefix]);
     if (domain != null) ensureUniqueId(domain, id);
     if (domain != null) validateRelations(domain, input);
     final xp = input['xpStats'] is XPStats
@@ -247,7 +249,7 @@ class CreationService {
       'niveau': 2,
       'type': 'Artisan',
       'etat': 'occupé',
-      'assignedBatimentId': 'bat_mine',
+      'assignedBatimentId': 'bat-mine',
       'dortoir': 'Maison A',
       'pvMax': 100,
       'attaque': 5,
@@ -274,7 +276,7 @@ class CreationService {
       'description': 'Extrait des minerais',
       'niveau': 3,
       'xpStats': {'level': 3, 'currentXp': 120, 'xpToNextLevel': 300},
-      'producedResourceId': 'res_fer',
+      'producedResourceId': 'res-fer',
     };
   }
 
@@ -282,7 +284,7 @@ class CreationService {
     return {
       'ressources': [
         {
-          'id': 'res_fer',
+          'id': 'res-fer',
           'nom': 'Minerai de fer',
           'fonction': 'Craft',
           'sousCategorie': 'production',
@@ -293,7 +295,7 @@ class CreationService {
       ],
       'batiments': [
         {
-          'id': 'bat_mine',
+          'id': 'bat-mine',
           'nom': 'Mine',
           'fonction': 'Extraction',
           'sousCategorie': 'production',

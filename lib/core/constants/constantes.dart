@@ -2,6 +2,23 @@
 
 import 'package:flutter/material.dart';
 
+// ===================== Capacités & coûts (top-level) =====================
+
+/// Capacités de population par bâtiment et par niveau (index 0 = niveau 1)
+const Map<String, List<int>> BUILDING_CAPACITY_BY_LEVEL = {
+  BuildingKeys.BAT_CABANE_EXPLORATEUR: [2, 4, 6, 8, 10],
+  BuildingKeys.BAT_CASERNE: [10, 15, 20, 30, 40],
+};
+
+/// Coût en Novas pour recruter des personnages
+const Map<String, int> PERSONNAGE_COST_NOVAS = {
+  AppStrings.TYPE_EXPLORATEUR: 8,
+  AppStrings.TYPE_SOLDAT: 10,
+};
+
+/// Solde initial de Novas pour le domaine seed
+const double STARTING_NOVAS = 100.0;
+
 class AppStrings {
   // App
   static const String appTitle = 'TerraNova 1.1';
@@ -101,6 +118,7 @@ class AppStrings {
   static const String resPierre = 'Pierre';
   static const String resCuir = 'Cuir';
   static const String resCereale = 'Céréale';
+  static const String NAME_NOVAS = 'Novas';
 
   // Ressources — descriptions
   static const String descEau = 'Ressource vitale: eau.';
@@ -112,6 +130,7 @@ class AppStrings {
   static const String descPierre = 'Roche brute.';
   static const String descCuir = 'Cuir tanné.';
   static const String descCereale = 'Céréales de base.';
+  static const String DESC_NOVAS = 'Monnaie officielle du Domaine, utilisée pour recruter des personnages et payer des services.';
 
   // Raretés — libellés
   static const String rarityAbundant = 'Abondante';
@@ -122,6 +141,16 @@ class AppStrings {
 
   // Domain — valeurs par défaut
   static const String defaultDomainName = 'Domaine Alpha';
+
+  // Bâtiments — nouveaux noms & descriptions
+  static const String NAME_CASERNE = 'Caserne';
+  static const String DESC_CASERNE = 'Bâtiment militaire permettant de recruter et héberger des Soldats.';
+  static const String NAME_CABANE_EXPLORATEUR = 'Cabane d\'explorateur';
+  static const String DESC_CABANE_EXPLORATEUR = 'Petit camp qui forme des Explorateurs et permet d\'étendre la découverte.';
+
+  // Personnages — nouveaux types
+  static const String TYPE_SOLDAT = 'Soldat';
+  static const String TYPE_EXPLORATEUR = 'Explorateur';
 
   // Fonctions — libellés pour éléments
   static const String funcQG = 'Centre de commandement';
@@ -157,6 +186,13 @@ class AppNames {
   ];
 }
 
+class AppIds {
+  // Préfixes canoniques d'identifiants
+  static const String persPrefix = 'pers-';
+  static const String batPrefix = 'bat-';
+  static const String resPrefix = 'res-';
+}
+
 // ===================== Clés canoniques & recettes de transformation =====================
 
 /// Identifiants canoniques des ressources (indépendants des IDs runtime)
@@ -170,6 +206,7 @@ class ResourceKeys {
   static const String cereale = 'res_key_cereale';
   static const String cuir = 'res_key_cuir';
   static const String outilSimple = 'res_key_outil_simple';
+  static const String RES_NOVAS = 'res-novas';
 }
 
 /// Identifiants canoniques des bâtiments (pour les ateliers de transformation)
@@ -177,6 +214,8 @@ class BuildingKeys {
   static const String atelierTannage = 'build_key_atelier_tannage';
   static const String atelierPierre = 'build_key_atelier_pierre';
   static const String boucherie = 'build_key_boucherie';
+  static const String BAT_CASERNE = 'bat-caserne';
+  static const String BAT_CABANE_EXPLORATEUR = 'bat-cabane-explorateur';
 }
 
 /// Mapping clé ressource -> libellé officiel (résolution dans le Domain par nom)
@@ -190,6 +229,7 @@ const Map<String, String> RESOURCE_KEY_TO_NAME = {
   ResourceKeys.cereale: AppStrings.resCereale,
   ResourceKeys.cuir: AppStrings.resCuir,
   ResourceKeys.outilSimple: AppStrings.resOutilSimple,
+  ResourceKeys.RES_NOVAS: AppStrings.NAME_NOVAS,
 };
 
 /// Mapping clé bâtiment -> libellé officiel (résolution dans le Domain par nom)
@@ -197,6 +237,8 @@ const Map<String, String> BUILDING_KEY_TO_NAME = {
   BuildingKeys.atelierTannage: AppStrings.batAtelierTannage,
   BuildingKeys.atelierPierre: AppStrings.batAtelierPierre,
   BuildingKeys.boucherie: AppStrings.batBoucherie,
+  BuildingKeys.BAT_CASERNE: AppStrings.NAME_CASERNE,
+  BuildingKeys.BAT_CABANE_EXPLORATEUR: AppStrings.NAME_CABANE_EXPLORATEUR,
 };
 
 /// Recettes de transformation
